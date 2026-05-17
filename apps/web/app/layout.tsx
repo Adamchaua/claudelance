@@ -3,6 +3,7 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 
 import { BottomNav } from "@/components/bottom-nav";
+import { InstallPrompt } from "@/components/install-prompt";
 
 import { Providers } from "./providers";
 import "./globals.css";
@@ -19,12 +20,17 @@ export const metadata: Metadata = {
     type: "website",
     images: ["/logo.png"],
   },
-  icons: { icon: "/favicon.ico" },
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: "/manifest.webmanifest",
 };
 
 export const viewport = {
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#F1F4FA" },
     { media: "(prefers-color-scheme: dark)", color: "#0C0E1A" },
@@ -37,6 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-dvh pb-[calc(5rem+env(safe-area-inset-bottom))] font-sans md:pb-0">
         <Providers>
           {children}
+          <InstallPrompt />
           <BottomNav />
         </Providers>
       </body>
