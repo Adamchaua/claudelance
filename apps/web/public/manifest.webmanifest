@@ -1,14 +1,24 @@
 {
   "name": "Claudelance",
   "short_name": "Claudelance",
-  "description": "Earn cUSD and CELO by solving GitHub bounties with Claude Code.",
+  "description": "On-chain AI bounty marketplace on Celo Mainnet",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0C0E1A",
-  "theme_color": "#18D2B4",
+  "theme_color": "#7C5CFC",
+  "orientation": "portrait-primary",
   "icons": [
-    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }

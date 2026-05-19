@@ -2,15 +2,28 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Rss, Settings, SquarePen, UserCircle } from "lucide-react";
+import { Home, Rss, SquarePen, UserCircle } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { label: "Feed", href: "/", icon: Rss, match: (path: string) => path === "/" },
+  { label: "Home", href: "/", icon: Home, match: (path: string) => path === "/" },
+  {
+    label: "Bounties",
+    href: "/bounties",
+    icon: Rss,
+    match: (path: string) =>
+      path === "/bounties" ||
+      path.startsWith("/bounties/") ||
+      path.startsWith("/bounty/"),
+  },
   { label: "Post", href: "/post", icon: SquarePen, match: startsWith("/post") },
-  { label: "Profile", href: "/worker/me", icon: UserCircle, match: startsWith("/worker") },
-  { label: "Settings", href: "/settings", icon: Settings, match: startsWith("/settings") },
+  {
+    label: "Profile",
+    href: "/worker/me",
+    icon: UserCircle,
+    match: startsWith("/worker"),
+  },
 ] as const;
 
 export function BottomNav() {

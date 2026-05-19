@@ -1,79 +1,100 @@
 "use client";
 
-import * as React from "react";
+import { useCallback, useEffect, useState } from "react";
+import { Download, X } from "lucide-react";
 
 const DISMISS_KEY = "claudelance-install-prompt-dismissed";
 
-type BeforeInstallPromptEvent = Event & {
+interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
-};
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+}
 
 export function InstallPrompt() {
-  const [event, setEvent] = React.useState<BeforeInstallPromptEvent | null>(null);
-  const [dismissed, setDismissed] = React.useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [dismissed, setDismissed] = useState(false);
 
-  React.useEffect(() => {
+  const persistDismissal = useCallback(() => {
+    window.localStorage.setItem(DISMISS_KEY, "true");
+    setDismissed(true);
+    setDeferredPrompt(null);
+  }, []);
+
+  useEffect(() => {
     setDismissed(window.localStorage.getItem(DISMISS_KEY) === "true");
 
-    const handleBeforeInstallPrompt = (e: Event) => {
+    const handleBeforeInstall = (e: Event) => {
       e.preventDefault();
-      setEvent(e as BeforeInstallPromptEvent);
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
       setDismissed(window.localStorage.getItem(DISMISS_KEY) === "true");
     };
 
     const handleAppInstalled = () => {
-      setEvent(null);
-      window.localStorage.setItem(DISMISS_KEY, "true");
-      setDismissed(true);
+      persistDismissal();
     };
 
-    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    window.addEventListener("beforeinstallprompt", handleBeforeInstall);
     window.addEventListener("appinstalled", handleAppInstalled);
 
     return () => {
-      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstall);
       window.removeEventListener("appinstalled", handleAppInstalled);
     };
-  }, []);
+  }, [persistDismissal]);
 
-  const dismiss = () => {
-    window.localStorage.setItem(DISMISS_KEY, "true");
-    setDismissed(true);
-  };
+  const handleInstall = async () => {
+    if (!deferredPrompt) return;
 
-  const install = async () => {
-    if (!event) return;
+    await deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice.catch(() => ({ outcome: "dismissed" as const }));
 
-    await event.prompt();
-    const choice = await event.userChoice.catch(() => null);
-    setEvent(null);
-
-    if (choice?.outcome !== "dismissed") {
-      window.localStorage.setItem(DISMISS_KEY, "true");
-      setDismissed(true);
+    if (outcome === "accepted") {
+      persistDismissal();
     }
   };
 
-  if (!event || dismissed) return null;
+  if (!deferredPrompt || dismissed) return null;
 
   return (
-    <div className="fixed inset-x-4 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-50 rounded-2xl border border-emerald-400/30 bg-slate-950/95 p-4 text-white shadow-2xl backdrop-blur md:left-auto md:right-6 md:max-w-sm">
-      <div className="flex items-start justify-between gap-3">
-        <div>
+    <div
+      role="alert"
+      className="fixed inset-x-4 bottom-20 z-50 mx-auto max-w-sm rounded-2xl border border-border bg-card p-4 shadow-glass-strong backdrop-blur-xl md:bottom-6"
+    >
+      <div className="flex items-start gap-3">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <Download className="h-5 w-5" />
+        </span>
+        <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold">Install Claudelance</p>
-          <p className="mt-1 text-xs text-slate-300">Add the app to your home screen for faster bounty work.</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Add to your home screen for quick access to bounties.
+          </p>
+          <div className="mt-3 flex gap-2">
+            <button
+              type="button"
+              onClick={handleInstall}
+              className="rounded-full bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground shadow-glow transition hover:opacity-90"
+            >
+              Install
+            </button>
+            <button
+              type="button"
+              onClick={persistDismissal}
+              className="rounded-full px-3 py-1.5 text-xs font-medium text-muted-foreground transition hover:text-foreground"
+            >
+              Not now
+            </button>
+          </div>
         </div>
-        <button className="min-h-11 min-w-11 rounded-full text-slate-300 hover:text-white" onClick={dismiss} aria-label="Dismiss install prompt">
-          x
+        <button
+          type="button"
+          onClick={persistDismissal}
+          className="shrink-0 rounded-full p-1 text-muted-foreground transition hover:text-foreground"
+          aria-label="Dismiss install prompt"
+        >
+          <X className="h-4 w-4" />
         </button>
       </div>
-      <button
-        className="mt-3 min-h-11 w-full rounded-xl bg-emerald-400 px-4 text-sm font-semibold text-slate-950"
-        onClick={install}
-      >
-        Install app
-      </button>
     </div>
   );
 }

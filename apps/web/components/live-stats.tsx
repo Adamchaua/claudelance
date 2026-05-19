@@ -2,7 +2,7 @@ import { ArrowUpRight, Coins, Hammer, ScanLine, Users } from "lucide-react";
 
 import { GlassCard } from "@/components/ui/card";
 import { fetchLiveStats } from "@/lib/stats";
-import { formatCUSD } from "@/lib/utils";
+import { formatCELO } from "@/lib/utils";
 import { getDeployment } from "@/lib/contracts";
 import { DEFAULT_CHAIN_ID, chainById } from "@/lib/chain";
 
@@ -37,7 +37,7 @@ export async function LiveStats() {
             href={`${chain?.blockExplorers?.default.url}/address/${deployment.core}#code`}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+            className="touch-target inline-flex items-center gap-1 rounded-full text-sm text-muted-foreground hover:text-foreground"
           >
             View verified contract <ArrowUpRight className="h-3.5 w-3.5" />
           </a>
@@ -54,8 +54,9 @@ export async function LiveStats() {
             />
             <Stat
               icon={<Coins className="h-4 w-4" />}
-              label="cUSD volume"
-              value={`$${formatCUSD(snapshot.totalBountyVolume)}`}
+              label="Total volume"
+              value={`${formatCELO(snapshot.totalVolumeInCelo)} CELO`}
+              sub={`CELO ≈ $${snapshot.celoUsdPrice.toFixed(2)}`}
             />
             <Stat
               icon={<ScanLine className="h-4 w-4" />}
