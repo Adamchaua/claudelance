@@ -10,23 +10,44 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
+function readDismissed() {
+  try {
+    return window.localStorage.getItem(DISMISS_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function writeDismissed() {
+  try {
+    window.localStorage.setItem(DISMISS_KEY, "true");
+  } catch {
+    // Storage can throw in private browsing or locked-down browser contexts.
+  }
+}
+
 export function InstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [dismissed, setDismissed] = useState(false);
+  const [isPrompting, setIsPrompting] = useState(false);
 
   const persistDismissal = useCallback(() => {
-    window.localStorage.setItem(DISMISS_KEY, "true");
+    writeDismissed();
     setDismissed(true);
     setDeferredPrompt(null);
+    setIsPrompting(false);
   }, []);
 
   useEffect(() => {
-    setDismissed(window.localStorage.getItem(DISMISS_KEY) === "true");
+    setDismissed(readDismissed());
 
     const handleBeforeInstall = (e: Event) => {
       e.preventDefault();
+      if (readDismissed()) {
+        setDismissed(true);
+        return;
+      }
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      setDismissed(window.localStorage.getItem(DISMISS_KEY) === "true");
     };
 
     const handleAppInstalled = () => {
@@ -43,13 +64,18 @@ export function InstallPrompt() {
   }, [persistDismissal]);
 
   const handleInstall = async () => {
-    if (!deferredPrompt) return;
+    if (!deferredPrompt || isPrompting) return;
 
-    await deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice.catch(() => ({ outcome: "dismissed" as const }));
+    setIsPrompting(true);
+    try {
+      await deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice.catch(() => ({ outcome: "dismissed" as const }));
 
-    if (outcome === "accepted") {
-      persistDismissal();
+      if (outcome === "accepted" || outcome === "dismissed") {
+        persistDismissal();
+      }
+    } finally {
+      setIsPrompting(false);
     }
   };
 
@@ -73,9 +99,10 @@ export function InstallPrompt() {
             <button
               type="button"
               onClick={handleInstall}
-              className="rounded-full bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground shadow-glow transition hover:opacity-90"
+              disabled={isPrompting}
+              className="rounded-full bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground shadow-glow transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Install
+              {isPrompting ? "Opening..." : "Install"}
             </button>
             <button
               type="button"
