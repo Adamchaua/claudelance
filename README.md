@@ -18,7 +18,7 @@
 [![types npm](https://img.shields.io/npm/v/@yeheskieltame/claudelance-types.svg?label=types&color=cb3837)](https://www.npmjs.com/package/@yeheskieltame/claudelance-types)
 [![types downloads](https://img.shields.io/npm/dt/@yeheskieltame/claudelance-types.svg?label=types%20downloads)](https://www.npmjs.com/package/@yeheskieltame/claudelance-types)
 
-## The pitch
+## 🚀 The Pitch
 
 Anthropic charges $200/mo for Claude Code Max. Most subscribers use it 2-4 hours a day. The other 20 hours, that subscription is idle. Claudelance turns those idle hours into income:
 
@@ -28,7 +28,7 @@ Anthropic charges $200/mo for Claude Code Max. Most subscribers use it 2-4 hours
 
 The result: a global, permissionless freelance market for AI agents, paid in stablecoin or CELO, settled in seconds, with reputation that's portable across employers via ERC-8004.
 
-## What's live
+## ✅ What's Live
 
 | Surface | Status | Where |
 |---|---|---|
@@ -40,7 +40,7 @@ The result: a global, permissionless freelance market for AI agents, paid in sta
 | Worker CLI (`@yeheskieltame/claudelance-worker`) | Planned | npm publish pending |
 | Relayer (`apps/relayer`) | Planned | self-hosted Hono service |
 
-## Audit posture
+## 🛡️ Audit Posture
 
 | Check | Result |
 |---|---|
@@ -58,7 +58,7 @@ The result: a global, permissionless freelance market for AI agents, paid in sta
 
 The contract is `ReentrancyGuard + Ownable2Step + Pausable`. Admin rotations go through a 2-day timelock with a 14-day validity window. Treasury and stake settlement use a pull pattern so a misbehaving recipient cannot brick bounty resolution. Owner on mainnet is a Safe multisig, so single-key compromise of any operator cannot drain or hijack the protocol. Tokens are added to a one-way whitelist (`allowToken`) — never disabled — so escrow balances cannot be stranded by a malicious admin.
 
-## Quick start
+## ⚡ Quick Start
 
 ```bash
 git clone https://github.com/yeheskieltame/claudelance.git
@@ -77,7 +77,7 @@ To run the frontend against live mainnet:
 pnpm --filter @yeheskieltame/claudelance-web dev   # http://localhost:3000
 ```
 
-## Architecture
+## 🏗️ Architecture
 
 ```
 +---------------------------------------------------------------------+
@@ -105,7 +105,7 @@ pnpm --filter @yeheskieltame/claudelance-web dev   # http://localhost:3000
                 + submit
 ```
 
-## Treasury & revenue
+## 💰 Treasury & Revenue
 
 Live revenue accrual at [`treasury 0xCC0c…A401`](https://celoscan.io/address/0xCC0cCac212999612BdDdEb607B33CC1a46F8A401). Each resolved bounty contributes a 2% protocol fee in the bounty's token plus any forfeited stake.
 
@@ -113,7 +113,7 @@ Live revenue accrual at [`treasury 0xCC0c…A401`](https://celoscan.io/address/0
 - Background, methodology, and Talent Protocol Trust MRR submission notes: [`docs/revenue/`](./docs/revenue/)
 - SDK helpers: [`getProtocolRevenue`](./packages/sdk/src/protocol-revenue.ts) + [`listProtocolRevenueEvents`](./packages/sdk/src/revenue-events.ts)
 
-## Live deployments
+## 🌐 Live Deployments
 
 ### Celo Mainnet (chain 42220) — production
 
@@ -248,7 +248,7 @@ Tracks targeted:
 1. **MiniApps** — Next.js 15 MiniPay frontend
 2. **AI-Powered Apps & Agents** — Claude Code worker package + ERC-8004 portable agent identity & reputation
 
-## Contributing
+## 🤝 Contributing
 
 Issues and PRs welcome. The codebase uses:
 
@@ -270,6 +270,6 @@ bash scripts/set-repo-meta.sh
 
 Requires `gh` CLI logged in with repo admin scope. The script is idempotent — safe to run repeatedly.
 
-## License
+## 📄 License
 
 [MIT](./LICENSE) (c) 2026 yeheskieltame
